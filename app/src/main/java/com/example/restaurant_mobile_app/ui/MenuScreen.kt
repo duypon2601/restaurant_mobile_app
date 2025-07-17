@@ -1,15 +1,20 @@
 package com.example.restaurant_mobile_app.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.restaurant_mobile_app.R
 import com.example.restaurant_mobile_app.data.repository.MenuRepository
 import com.example.restaurant_mobile_app.network.RetrofitInstance
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun MenuScreen(
@@ -42,7 +47,18 @@ fun MenuScreen(
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column {
+                            // Hiển thị ảnh món ăn với fallback
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = item.imageUrl,
+                                    error = painterResource(R.drawable.default_food),
+                                    placeholder = painterResource(R.drawable.default_food)
+                                ),
+                                contentDescription = item.name ?: "Món ăn",
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(item.name ?: "Không tên", style = MaterialTheme.typography.titleMedium)
                                 Text(item.description ?: "", style = MaterialTheme.typography.bodySmall)
                                 Text("${item.price} đ", style = MaterialTheme.typography.bodyMedium)

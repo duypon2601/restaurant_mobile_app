@@ -36,7 +36,7 @@ fun TableSelectionScreen(
                     },
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
-                    Text("${table.qrCode ?: "Bàn ${table.id}"} (${table.status})")
+                    Text("Bàn ${table.id} (${table.status})")
                 }
             }
         }

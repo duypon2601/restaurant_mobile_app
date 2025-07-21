@@ -13,6 +13,9 @@ interface ApiService {
     @GET("menu")
     suspend fun getMenu(): RestResponse<List<MenuItem>>
 
+    @GET("food")
+    suspend fun getFoods(): RestResponse<List<Food>>
+
     @POST("order/create")
     suspend fun sendOrder(@Body order: Order): RestResponse<Any>
 } 

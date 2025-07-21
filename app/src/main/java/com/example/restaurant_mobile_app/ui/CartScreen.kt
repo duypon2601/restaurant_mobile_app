@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.restaurant_mobile_app.data.model.Food
+import com.example.restaurant_mobile_app.network.RetrofitInstance
 
 @Composable
 fun CartScreen(
@@ -16,6 +18,16 @@ fun CartScreen(
     appViewModel: AppViewModel = remember { AppViewModel() }
 ) {
     val cartItems by cartViewModel.cartItems.collectAsState()
+    val foodList = remember { mutableStateListOf<Food>() }
+    val foodMap = remember { mutableStateMapOf<Int, Food>() }
+
+    LaunchedEffect(Unit) {
+        val foods = RetrofitInstance.api.getFoods().data
+        foodList.clear()
+        foodList.addAll(foods)
+        foodMap.clear()
+        foodMap.putAll(foods.associateBy { it.id })
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         Text("Giỏ hàng", style = MaterialTheme.typography.titleLarge)
@@ -26,7 +38,9 @@ fun CartScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text(cartItem.menuItem.name ?: "Không tên")
+                        val food = foodMap[cartItem.menuItem.foodId]
+                        val name = food?.name ?: "Không tên"
+                        Text(name)
                         Text("${cartItem.menuItem.price} đ")
                     }
                     Row {

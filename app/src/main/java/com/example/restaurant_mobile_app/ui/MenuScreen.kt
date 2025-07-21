@@ -15,6 +15,8 @@ import com.example.restaurant_mobile_app.R
 import com.example.restaurant_mobile_app.data.repository.MenuRepository
 import com.example.restaurant_mobile_app.network.RetrofitInstance
 import coil.compose.rememberAsyncImagePainter
+import com.example.restaurant_mobile_app.data.model.Food
+import com.example.restaurant_mobile_app.ui.FirebaseImage
 
 @Composable
 fun MenuScreen(
@@ -27,7 +29,18 @@ fun MenuScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.loadMenu() }
+    val foodList = remember { mutableStateListOf<Food>() }
+    val foodMap = remember { mutableStateMapOf<Int, Food>() }
+
+    LaunchedEffect(Unit) {
+        // Lấy danh sách food từ API
+        val foods = RetrofitInstance.api.getFoods().data
+        foodList.clear()
+        foodList.addAll(foods)
+        foodMap.clear()
+        foodMap.putAll(foods.associateBy { it.id })
+        viewModel.loadMenu()
+    }
 
     when {
         isLoading -> CircularProgressIndicator()
@@ -35,6 +48,9 @@ fun MenuScreen(
         else -> {
             LazyColumn(modifier = Modifier.fillMaxSize().padding(8.dp)) {
                 items(menu) { item ->
+                    val food = foodMap[item.foodId]
+                    val name = food?.name ?: "Không tên"
+                    val imageUrl = food?.image_url
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -47,20 +63,14 @@ fun MenuScreen(
                                 .padding(8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            // Hiển thị ảnh món ăn với fallback
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = item.imageUrl,
-                                    error = painterResource(R.drawable.default_food),
-                                    placeholder = painterResource(R.drawable.default_food)
-                                ),
-                                contentDescription = item.name ?: "Món ăn",
-                                modifier = Modifier.size(80.dp)
+                            FirebaseImage(
+                                storagePath = imageUrl,
+                                modifier = Modifier.size(80.dp),
+                                contentDescription = name
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(item.name ?: "Không tên", style = MaterialTheme.typography.titleMedium)
-                                Text(item.description ?: "", style = MaterialTheme.typography.bodySmall)
+                                Text(name, style = MaterialTheme.typography.titleMedium)
                                 Text("${item.price} đ", style = MaterialTheme.typography.bodyMedium)
                             }
                             Button(onClick = { cartViewModel.addToCart(item) }) {

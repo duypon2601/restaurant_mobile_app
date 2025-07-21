@@ -11,6 +11,7 @@ import com.example.restaurant_mobile_app.data.model.OrderItem
 import com.example.restaurant_mobile_app.data.repository.OrderRepository
 import com.example.restaurant_mobile_app.network.RetrofitInstance
 import java.math.BigDecimal
+import com.example.restaurant_mobile_app.data.model.Food
 
 @Composable
 fun OrderScreen(
@@ -24,6 +25,17 @@ fun OrderScreen(
     val error by orderViewModel.error.collectAsState()
     val cartItems by cartViewModel.cartItems.collectAsState()
 
+    val foodList = remember { mutableStateListOf<Food>() }
+    val foodMap = remember { mutableStateMapOf<Int, Food>() }
+
+    LaunchedEffect(Unit) {
+        val foods = RetrofitInstance.api.getFoods().data
+        foodList.clear()
+        foodList.addAll(foods)
+        foodMap.clear()
+        foodMap.putAll(foods.associateBy { it.id })
+    }
+
     var sent by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -32,12 +44,14 @@ fun OrderScreen(
         if (!sent) {
             Button(
                 onClick = {
-                    val orderItems = cartItems.map {
+                    val orderItems = cartItems.map { item ->
+                        val food = foodMap[item.menuItem.foodId]
+                        val name = food?.name ?: "Không tên"
                         OrderItem(
-                            menuItemId = it.menuItem.id,
-                            quantity = it.quantity,
-                            price = it.menuItem.price, // Đã là Double, không cần toBigDecimal()
-                            menuItemName = it.menuItem.name ?: "Không tên"
+                            menuItemId = item.menuItem.id,
+                            quantity = item.quantity,
+                            price = item.menuItem.price, // Đã là Double, không cần toBigDecimal()
+                            menuItemName = name
                         )
                     }
                     val totalPrice = cartItems.fold(0.0) { acc, item ->

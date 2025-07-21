@@ -2,8 +2,8 @@ package com.example.restaurant_mobile_app.data.model
 
 data class MenuItem(
     val id: Int,
-    val name: String?,
-    val description: String?,
     val price: Double,
-    val imageUrl: String?
+    val foodId: Int,
+    val restaurantMenuId: Int,
+    val isAvailable: Boolean
 ) 

@@ -7,6 +7,7 @@ import com.example.restaurant_mobile_app.data.repository.TableRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.restaurant_mobile_app.MyApp
 
 class TableSelectionViewModel(private val repository: TableRepository) : ViewModel() {
     private val _tables = MutableStateFlow<List<Table>>(emptyList())

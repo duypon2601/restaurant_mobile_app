@@ -16,6 +16,9 @@ interface ApiService {
     @GET("food")
     suspend fun getFoods(): RestResponse<List<Food>>
 
+    @GET("menu/{id}/items")
+    suspend fun getMenuItemsByMenuId(@retrofit2.http.Path("id") menuId: Int): RestResponse<List<MenuItem>>
+
     @POST("order/create")
     suspend fun sendOrder(@Body order: Order): RestResponse<Any>
 } 

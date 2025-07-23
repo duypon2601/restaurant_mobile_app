@@ -31,4 +31,18 @@ class MenuViewModel(private val repository: MenuRepository) : ViewModel() {
             }
         }
     }
+
+    fun loadMenuItemsByMenuId(menuId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                _menu.value = repository.getMenuItemsByMenuId(menuId)
+            } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 } 

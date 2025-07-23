@@ -21,6 +21,7 @@ import com.example.restaurant_mobile_app.ui.FirebaseImage
 @Composable
 fun MenuScreen(
     navController: NavHostController,
+    menuId: Int = 1, // <-- Thêm tham số menuId, mặc định là 1
     cartViewModel: CartViewModel = remember { CartViewModel() },
     appViewModel: AppViewModel = remember { AppViewModel() }
 ) {
@@ -32,25 +33,25 @@ fun MenuScreen(
     val foodList = remember { mutableStateListOf<Food>() }
     val foodMap = remember { mutableStateMapOf<Int, Food>() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(menuId) {
         // Lấy danh sách food từ API
         val foods = RetrofitInstance.api.getFoods().data
         foodList.clear()
         foodList.addAll(foods)
         foodMap.clear()
         foodMap.putAll(foods.associateBy { it.id })
-        viewModel.loadMenu()
+        viewModel.loadMenuItemsByMenuId(menuId)
     }
 
     when {
         isLoading -> CircularProgressIndicator()
         error != null -> Text("Lỗi: $error")
         else -> {
+            Text("Số lượng món: ${menu.size}", style = MaterialTheme.typography.bodyLarge)
             LazyColumn(modifier = Modifier.fillMaxSize().padding(8.dp)) {
                 items(menu) { item ->
-                    val food = foodMap[item.foodId]
-                    val name = food?.name ?: "Không tên"
-                    val imageUrl = food?.image_url
+                    val name = item.foodName ?: "Không tên"
+                    val imageUrl = item.imageUrl
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()

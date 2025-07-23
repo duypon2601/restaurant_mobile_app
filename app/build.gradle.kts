@@ -67,4 +67,13 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.compose.ui:ui:1.5.0")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
+    // Accompanist libraries
+    implementation("com.google.accompanist:accompanist-pager:0.31.5-beta")
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.31.5-beta")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta")
+    // Lottie for Compose
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+    // Google Fonts for Compose
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.0")
 }

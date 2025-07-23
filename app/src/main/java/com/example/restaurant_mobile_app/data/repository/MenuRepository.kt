@@ -6,4 +6,5 @@ import com.example.restaurant_mobile_app.network.ApiService
  
 class MenuRepository(private val api: ApiService) {
     suspend fun getMenu(): List<MenuItem> = api.getMenu().data
+    suspend fun getMenuItemsByMenuId(menuId: Int): List<MenuItem> = api.getMenuItemsByMenuId(menuId).data
 } 

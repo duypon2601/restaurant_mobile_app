@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("table_selection") { TableSelectionScreen(navController, appViewModel) }
-                        composable("menu") { MenuScreen(navController, cartViewModel, appViewModel) }
+                        composable("menu") { MenuScreen(navController, menuId = 1, cartViewModel = cartViewModel, appViewModel = appViewModel) }
                         composable("cart") { CartScreen(navController, cartViewModel, appViewModel) }
                         composable("order") {
                             val tableId = appViewModel.selectedTableId.collectAsState().value

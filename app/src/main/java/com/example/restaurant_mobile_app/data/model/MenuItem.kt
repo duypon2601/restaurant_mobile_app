@@ -5,5 +5,8 @@ data class MenuItem(
     val price: Double,
     val foodId: Int,
     val restaurantMenuId: Int,
-    val isAvailable: Boolean
+    val isAvailable: Boolean,
+    val foodName: String?,
+    val categoryName: String?,
+    val imageUrl: String?
 ) 

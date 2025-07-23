@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.Alignment
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(
     navController: NavHostController,
@@ -40,6 +41,10 @@ fun MenuScreen(
     val foodList = remember { mutableStateListOf<Food>() }
     val foodMap = remember { mutableStateMapOf<Int, Food>() }
     val cartCount by cartViewModel.cartItems.collectAsState()
+
+    val categories = remember(menu) { menu.mapNotNull { it.categoryName }.distinct().sorted() }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(menuId) {
         // Lấy danh sách food từ API
@@ -58,9 +63,47 @@ fun MenuScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 // Danh sách món ăn
                 Column(modifier = Modifier.fillMaxSize()) {
+                    // Dropdown lọc category
+                    Row(modifier = Modifier.padding(8.dp)) {
+                        ExposedDropdownMenuBox(
+                            expanded = expanded,
+                            onExpandedChange = { expanded = !expanded }
+                        ) {
+                            TextField(
+                                value = selectedCategory ?: "Tất cả",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Danh mục") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                                modifier = Modifier.menuAnchor().weight(1f)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Tất cả") },
+                                    onClick = {
+                                        selectedCategory = null
+                                        expanded = false
+                                    }
+                                )
+                                categories.forEach { category ->
+                                    DropdownMenuItem(
+                                        text = { Text(category) },
+                                        onClick = {
+                                            selectedCategory = category
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                     Text("Số lượng món: ${menu.size}", style = MaterialTheme.typography.bodyLarge)
+                    val filteredMenu = if (selectedCategory == null) menu else menu.filter { it.categoryName == selectedCategory }
                     LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
-                        items(menu) { item ->
+                        items(filteredMenu) { item ->
                             val name = item.foodName ?: "Không tên"
                             val imageUrl = item.imageUrl
                             Card(

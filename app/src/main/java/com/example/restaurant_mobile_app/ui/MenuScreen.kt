@@ -17,6 +17,13 @@ import com.example.restaurant_mobile_app.network.RetrofitInstance
 import coil.compose.rememberAsyncImagePainter
 import com.example.restaurant_mobile_app.data.model.Food
 import com.example.restaurant_mobile_app.ui.FirebaseImage
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Badge
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.ui.Alignment
 
 @Composable
 fun MenuScreen(
@@ -32,6 +39,7 @@ fun MenuScreen(
 
     val foodList = remember { mutableStateListOf<Food>() }
     val foodMap = remember { mutableStateMapOf<Int, Food>() }
+    val cartCount by cartViewModel.cartItems.collectAsState()
 
     LaunchedEffect(menuId) {
         // Lấy danh sách food từ API
@@ -47,45 +55,63 @@ fun MenuScreen(
         isLoading -> CircularProgressIndicator()
         error != null -> Text("Lỗi: $error")
         else -> {
-            Text("Số lượng món: ${menu.size}", style = MaterialTheme.typography.bodyLarge)
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-                items(menu) { item ->
-                    val name = item.foodName ?: "Không tên"
-                    val imageUrl = item.imageUrl
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            FirebaseImage(
-                                storagePath = imageUrl,
-                                modifier = Modifier.size(80.dp),
-                                contentDescription = name
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(name, style = MaterialTheme.typography.titleMedium)
-                                Text("${item.price} đ", style = MaterialTheme.typography.bodyMedium)
-                            }
-                            Button(onClick = { cartViewModel.addToCart(item) }) {
-                                Text("Thêm vào giỏ")
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Danh sách món ăn
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text("Số lượng món: ${menu.size}", style = MaterialTheme.typography.bodyLarge)
+                    LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
+                        items(menu) { item ->
+                            val name = item.foodName ?: "Không tên"
+                            val imageUrl = item.imageUrl
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                elevation = CardDefaults.cardElevation(2.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    FirebaseImage(
+                                        storagePath = imageUrl,
+                                        modifier = Modifier.size(80.dp),
+                                        contentDescription = name
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(name, style = MaterialTheme.typography.titleMedium)
+                                        Text("${item.price} đ", style = MaterialTheme.typography.bodyMedium)
+                                    }
+                                    Button(onClick = { cartViewModel.addToCart(item) }) {
+                                        Text("Thêm vào giỏ")
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-            Button(
-                onClick = { navController.navigate("cart") },
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-            ) {
-                Text("Xem giỏ hàng")
+                // Nút giỏ hàng nổi góc trên bên phải
+                Box(modifier = Modifier.fillMaxSize()) {
+                    FloatingActionButton(
+                        onClick = { navController.navigate("cart") },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                    ) {
+                        BadgedBox(
+                            badge = {
+                                if (cartCount.sumOf { it.quantity } > 0) {
+                                    Badge { Text(cartCount.sumOf { it.quantity }.toString()) }
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Xem giỏ hàng")
+                        }
+                    }
+                }
             }
         }
     }
